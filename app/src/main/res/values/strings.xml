@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Movie Clue</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="api_key">api_key=39eded7c924a15985f6ce7c11be25a40</string>
+    <string name="image_path">http://image.tmdb.org/t/p/original</string>
+</resources>
