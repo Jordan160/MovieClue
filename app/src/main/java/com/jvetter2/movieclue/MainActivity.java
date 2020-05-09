@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         Thread thread = new Thread() {
             public void run() {
-                while (progressStatus < 20 && npMovieNames!= null && npMovieNames.size() != 10) {
+                while (progressStatus < 20 && npMovieNames!= null && npMovieNames.size() < 10) {
                     progressStatus += 1;
                     try {
                         Thread.sleep(1000);
@@ -169,16 +169,13 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             JSONArray jsonArray = jsonObject.getJSONArray("results");
-            for (int i = 0; i < jsonArray.length(); i++) {
+            for (int i = 0; i < 10; i++) {
                 JSONObject c = jsonArray.getJSONObject(i);
                 if(null != movieNames && !movieNames.contains(c.getString("title"))) {
                     movieNames.add(i+1 + ". " + c.getString("title"));
                     movieDescriptions.add(c.getString("overview"));
                     getMovieImage(c.getString("backdrop_path"), movieImages);
                 }
-//                if(i == 10) {
-//                    movieImages.add(BitmapFactory.decodeResource(getResources(), R.drawable.ic_tmdblogo);
-//                }
             }
             if (url.equalsIgnoreCase(getString(R.string.upcoming_url))) {
                 setUpMovieNames(movieNames);
@@ -291,8 +288,12 @@ public class MainActivity extends AppCompatActivity {
         mList.clear();
         for (int i = 0; i < movieImages.size(); i++) {
             Movie movie = new Movie();
+            if (i == 9) {
+                movie.setDescription(movieDescriptions.get(i) + "\n" + "\n");
+            } else {
+                movie.setDescription(movieDescriptions.get(i));
+            }
             movie.setName(movieNames.get(i));
-            movie.setDescription(movieDescriptions.get(i));
             movie.setImage(movieImages.get(i));
 
             mList.add(movie);
