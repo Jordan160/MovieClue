@@ -19,7 +19,6 @@ public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
 
             InputStream in = connection.getInputStream();
             Bitmap myBitmap = BitmapFactory.decodeStream(in);
-
             return myBitmap;
         } catch (Exception e) {
             e.printStackTrace();
@@ -29,7 +28,6 @@ public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-
         super.onPostExecute(bitmap);
     }
 }

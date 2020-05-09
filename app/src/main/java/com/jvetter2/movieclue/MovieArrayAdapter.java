@@ -51,7 +51,6 @@ public class MovieArrayAdapter extends RecyclerView.Adapter<MovieArrayAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        //public ImageButton item;
         public TextView movieName;
         public TextView movieDescription;
         public ImageView movieImage;
@@ -60,12 +59,6 @@ public class MovieArrayAdapter extends RecyclerView.Adapter<MovieArrayAdapter.Vi
             movieName = (TextView) itemView.findViewById(R.id.tv_name);
             movieDescription = (TextView) itemView.findViewById(R.id.description);
             movieImage = (ImageView) itemView.findViewById(R.id.row_item);
-            //itemView.setOnClickListener(this);
-            //item = (ImageButton) itemView.findViewById(R.id.row_item);
         }
-//        @Override
-//        public void onClick(View view) {
-//            Log.d("onclick", "onClick " + getLayoutPosition() + " " + item.getId());
-//        }
     }
 }

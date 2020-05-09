@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/account"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="My Account"/>
+    <item android:id="@+id/now_playing"
+        android:icon="@drawable/ic_launcher_movie"
+        android:title="@string/now_playing"/>
+    <item android:id="@+id/upcoming"
+        android:icon="@drawable/ic_perm_contact_calendar_black_24dp"
+        android:title="@string/upcoming"/>
+    <item android:id="@+id/popular"
+        android:icon="@drawable/ic_photo_camera_black_24dp"
+        android:title="@string/popular"/>
+    <item android:id="@+id/top_rated"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="@string/top_rated"/>
     <item android:id="@+id/settings"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="Settings"/>
-    <item android:id="@+id/mycart"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="My Cart"/>
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"/>
+
 
 </menu>

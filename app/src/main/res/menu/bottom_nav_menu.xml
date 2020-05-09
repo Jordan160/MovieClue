@@ -2,21 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_recents"
+        android:id="@+id/now_playing"
         android:enabled="true"
         android:icon="@drawable/ic_launcher_movie"
-        android:title="Recents"
+        android:title="@string/now_playing"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_favorites"
+        android:id="@+id/upcoming"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_background"
-        android:title="Favorites"
+        android:icon="@drawable/ic_perm_contact_calendar_black_24dp"
+        android:title="@string/upcoming"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_nearby"
+        android:id="@+id/popular"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="Nearby"
+        android:icon="@drawable/ic_photo_camera_black_24dp"
+        android:title="@string/popular"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/top_rated"
+        android:enabled="true"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="@string/top_rated"
         app:showAsAction="ifRoom" />
 </menu>

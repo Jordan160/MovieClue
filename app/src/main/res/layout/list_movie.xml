@@ -6,28 +6,24 @@
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="match_parent"
-        android:layout_toRightOf="@+id/row_item"
-        android:layout_toEndOf="@+id/row_item"
-        android:layout_centerVertical="true"
-        android:text="@string/app_name"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed-medium"
         android:padding="10dp"
+        android:text="@string/app_name"
         android:textColor="#000"
-        android:textSize="20sp"
-        android:layout_height="wrap_content" />
+        android:textSize="30sp" />
 
     <ImageView
         android:id="@+id/row_item"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:contentDescription="@string/app_name"
         android:gravity="center" />
 
     <TextView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/row_item"
-        android:layout_toRightOf="@+id/row_item"
         android:padding="10dp"
         android:text="@string/app_name"
         android:textColor="#000"

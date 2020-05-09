@@ -1,132 +1,253 @@
 package com.jvetter2.movieclue;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
     private List<Movie> mList = new ArrayList<>();
     private MovieArrayAdapter mAdapter;
-
     private DrawerLayout dl;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
 
-    String result;
+    public ArrayList<String> upMovieNames = new ArrayList<>();
+    public ArrayList<String> upMovieDescriptions = new ArrayList<>();;
+    public ArrayList<Bitmap> upMovieImages = new ArrayList<>();
+    public ArrayList<String> npMovieNames = new ArrayList<>();
+    public ArrayList<String> npMovieDescriptions = new ArrayList<>();
+    public ArrayList<Bitmap> npMovieImages = new ArrayList<>();
+    public ArrayList<String> pMovieNames = new ArrayList<>();
+    public ArrayList<String> pMovieDescriptions = new ArrayList<>();
+    public ArrayList<Bitmap> pMovieImages = new ArrayList<>();
+    public ArrayList<String> topMovieNames = new ArrayList<>();
+    public ArrayList<String> topMovieDescriptions = new ArrayList<>();
+    public ArrayList<Bitmap> topMovieImages = new ArrayList<>();
+    public String[] urls;
+    private HandlerThread thread;
+    private int progressStatus = 0;
+    public FragmentManager fragmentManager;
+    public Fragment fragment;
 
+    public void setUpMovieNames(ArrayList<String> upMovieNames) {
+        this.upMovieNames = upMovieNames;
+    }
+
+    public void setUpMovieDescriptions(ArrayList<String> upMovieDescriptions) {
+        this.upMovieDescriptions = upMovieDescriptions;
+    }
+
+    public void setUpMovieImages(ArrayList<Bitmap> upMovieImages) {
+        this.upMovieImages = upMovieImages;
+    }
+
+    public void setNpMovieNames(ArrayList<String> npMovieNames) {
+        this.npMovieNames = npMovieNames;
+    }
+
+    public void setNpMovieDescriptions(ArrayList<String> npMovieDescriptions) {
+        this.npMovieDescriptions = npMovieDescriptions;
+    }
+
+    public void setNpMovieImages(ArrayList<Bitmap> npMovieImages) {
+        this.npMovieImages = npMovieImages;
+    }
+
+    public void setpMovieNames(ArrayList<String> pMovieNames) {
+        this.pMovieNames = pMovieNames;
+    }
+
+    public void setpMovieDescriptions(ArrayList<String> pMovieDescriptions) {
+        this.pMovieDescriptions = pMovieDescriptions;
+    }
+
+    public void setpMovieImages(ArrayList<Bitmap> pMovieImages) {
+        this.pMovieImages = pMovieImages;
+    }
+
+    public void setTopMovieNames(ArrayList<String> topMovieNames) {
+        this.topMovieNames = topMovieNames;
+    }
+
+    public void setTopMovieImages(ArrayList<Bitmap> topMovieImages) {
+        this.topMovieImages = topMovieImages;
+    }
+
+    public void setTopMovieDescriptions(ArrayList<String> topMovieDescriptions) {
+        this.topMovieDescriptions = topMovieDescriptions;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Resources res = getResources();
+        urls = res.getStringArray(R.array.urls);
+
+        final ProgressDialog dialog = ProgressDialog.show(this, "", "Retrieving latest movies...", true);
+
+        Thread thread = new Thread() {
+            public void run() {
+                while (progressStatus < 20 && npMovieNames!= null && npMovieNames.size() != 10) {
+                    progressStatus += 1;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                dialog.dismiss();
+            }
+        };
+        thread.start();
+
+
         recyclerView = (RecyclerView) findViewById(R.id.movie_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        //Recycler
-//        recyclerView = (RecyclerView) findViewById(R.id.movie_list);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//
-//        Movie movie = new Movie();
-//        movie.setImage(R.drawable.sonic_movie);
-//        movie.setName("Sonic the Hedgehog");
-//        movie.setDescription("Based on the global blockbuster videogame franchise from Sega, Sonic the Hedgehog tells the story of the world’s speediest hedgehog as he embraces his new home on Earth. In this live-action adventure comedy, Sonic and his new best friend team up to defend the planet from the evil genius Dr. Robotnik and his plans for world domination.");
-//        mList.add(movie);
-//        movie = new Movie();
-//        movie.setImage(R.drawable.sonic_movie);
-//        movie.setName("Sonic the Hedgehog2");
-//        movie.setDescription("Good movie");
-//        mList.add(movie);
-//
-//        mAdapter = new MovieArrayAdapter(mList, this);
-//
-//        recyclerView.setAdapter(mAdapter);
-//        mAdapter.notifyDataSetChanged();
+        setNavigationBar();
+        setBottomNavigation();
+        fragmentManager = getSupportFragmentManager();
 
-        //
+        getMoviesAsync("thread1", upMovieNames, upMovieDescriptions, upMovieImages, urls[0]);
+        getMoviesAsync("thread2", npMovieNames, npMovieDescriptions, npMovieImages, urls[1]);
+        getMoviesAsync("thread3", pMovieNames, pMovieDescriptions, pMovieImages, urls[2]);
+        getMoviesAsync("thread4", topMovieNames, topMovieDescriptions, topMovieImages, urls[3]);
+    }
 
-        dl = findViewById(R.id.activity_main);
-        t = new ActionBarDrawerToggle(this, dl, R.string.open, R.string.close);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (t.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        dl.addDrawerListener(t);
-        t.syncState();
+    private void getMovies(ArrayList<String> movieNames, ArrayList<String> movieDescriptions,
+                           ArrayList<Bitmap> movieImages, String url ) {
+        MovieList movieList = new MovieList();
+        String movie = movieList.downloadContent(url);
+        JSONObject jsonObject = null;
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            jsonObject = new JSONObject(movie);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        try {
+            JSONArray jsonArray = jsonObject.getJSONArray("results");
+            for (int i = 0; i < 10; i++) {
+                JSONObject c = jsonArray.getJSONObject(i);
+                if(null != movieNames && !movieNames.contains(c.getString("title"))) {
+                    movieNames.add(i+1 + ". " + c.getString("title"));
+                    movieDescriptions.add(c.getString("overview"));
+                    getMovieImage(c.getString("backdrop_path"), movieImages);
+                }
+            }
+            if (url.equalsIgnoreCase(getString(R.string.upcoming_url))) {
+                setUpMovieNames(movieNames);
+                setUpMovieDescriptions(movieDescriptions);
+                setUpMovieImages(movieImages);
+            } else if (url.equalsIgnoreCase(getString(R.string.now_playing_url))) {
+                setNpMovieNames(movieNames);
+                setNpMovieDescriptions(movieDescriptions);
+                setNpMovieImages(movieImages);
+            } else if (url.equalsIgnoreCase(getString(R.string.popular_url))) {
+                setpMovieNames(movieNames);
+                setpMovieDescriptions(movieDescriptions);
+                setpMovieImages(movieImages);
+            } else {
+                setTopMovieNames(movieNames);
+                setTopMovieDescriptions(movieDescriptions);
+                setTopMovieImages(movieImages);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getMovieImage(String imageURL, ArrayList<Bitmap> movieImages) {
+        ImageDownloader task = new ImageDownloader();
+
+        try {
+            String url = getString(R.string.image_path) + imageURL + "?" + getString(R.string.api_key);
+            movieImages.add(task.execute(url).get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setNavigationBar() {
         nv = findViewById(R.id.nv);
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 switch (id) {
-                    case R.id.account:
-                        Toast.makeText(MainActivity.this, "My Account", Toast.LENGTH_SHORT).show();
-                        MovieList movieList = new MovieList();
-                        String movie = movieList.downloadContent("hi", getApplicationContext());
-                        Log.i("movie result: ", movie);
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(movie);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
-                            JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject c = jsonArray.getJSONObject(i);
-                                //JSONObject moviez = (JSONObject) jsonArray.getString(0);
-                                //movieDescription = jsonObject.getString("overview");
-                                String movieTitle = c.getString("title");
-                                String movieDescription = c.getString("overview");
-                                String imageURL = c.getString("backdrop_path");
-                                updateMovieList(movieTitle, movieDescription, imageURL);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        //Log.i("Movie Title", movieTitle);
-
-                        //updateMovieList(movieTitle, movieDescription, "img");
-
-//                        TextView textview = findViewById(R.id.);
-//                        textview.setText(movie);
+                    case R.id.now_playing:
                         dl.closeDrawers();
+                        setMovies(npMovieNames, npMovieDescriptions, npMovieImages);
+                        break;
+                    case R.id.upcoming:
+                        dl.closeDrawers();
+                        setMovies(upMovieNames, upMovieDescriptions, upMovieImages);
+                        break;
+                    case R.id.popular:
+                        dl.closeDrawers();
+                        setMovies(pMovieNames, pMovieDescriptions, pMovieImages);
+                        break;
+                    case R.id.top_rated:
+                        dl.closeDrawers();
+                        setMovies(topMovieNames, topMovieDescriptions, topMovieImages);
                         break;
                     case R.id.settings:
-                        Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
                         dl.closeDrawers();
-                        break;
-                    case R.id.mycart:
-                        Toast.makeText(MainActivity.this, "My Cart", Toast.LENGTH_SHORT).show();
-                        dl.closeDrawers();
+
+                        fragment = SettingsFragment.newInstance();
+                        FragmentTransaction transaction2 = fragmentManager.beginTransaction();
+                        transaction2.replace(R.id.activity_main, fragment).commit();
                         break;
                     default:
                         return true;
@@ -135,83 +256,77 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        dl = findViewById(R.id.activity_main);
+        t = new ActionBarDrawerToggle(this, dl, R.string.open, R.string.close);
+        dl.addDrawerListener(t);
+        t.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        nv.setVisibility(View.INVISIBLE);
+    }
+
+    private void setBottomNavigation() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.action_recents:
-                        Toast.makeText(MainActivity.this, "Recents", Toast.LENGTH_SHORT).show();
+                    case R.id.now_playing:
+                        setMovies(npMovieNames, npMovieDescriptions, npMovieImages);
                         break;
-                    case R.id.action_favorites:
-                        Toast.makeText(MainActivity.this, "Favorites", Toast.LENGTH_SHORT).show();
+                    case R.id.upcoming:
+                        setMovies(upMovieNames, upMovieDescriptions, upMovieImages);
                         break;
-                    case R.id.action_nearby:
-                        Toast.makeText(MainActivity.this, "Nearby", Toast.LENGTH_SHORT).show();
+                    case R.id.popular:
+                        setMovies(pMovieNames, pMovieDescriptions, pMovieImages);
+                        break;
+                    case R.id.top_rated:
+                        setMovies(topMovieNames, topMovieDescriptions, topMovieImages);
                         break;
                 }
                 return true;
             }
         });
+        bottomNavigationView.getMenu().findItem(R.id.now_playing).setChecked(true);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (t.onOptionsItemSelected(item)) {
-            return true;
+    private void setMovies(ArrayList<String> movieNames, ArrayList<String> movieDescriptions,
+                          ArrayList<Bitmap> movieImages) {
+        mList.clear();
+        for (int i = 0; i < movieNames.size(); i++) {
+            Movie movie = new Movie();
+            movie.setName(movieNames.get(i));
+            movie.setDescription(movieDescriptions.get(i));
+            movie.setImage(movieImages.get(i));
+
+            mList.add(movie);
         }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void updateMovieList(String title, String description, String imageURL) {
-        Movie movie = new Movie();
-        //movie.setImage(R.drawable.sonic_movie);
-        movie.setName(title);
-        movie.setDescription(description);
-
-        Bitmap myImage = null;
-        ImageDownloader task = new ImageDownloader();
-//        try {
-//            result = task.execute("http://www.posh24.se/kandisar").get();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Log.i("Error downloading", "Oofta");
-//        }
-
-        try {
-            String url = getString(R.string.image_path) + imageURL + "?" + getString(R.string.api_key);
-            myImage = task.execute(url).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        //movie.setImage(getBitmapFromURL("https://image.tmdb.org/t/p/original/aQvJ5WPzZgYVDrxLX4R6cLJCEaQ.jpg"));
-        movie.setImage(myImage);
-
-        mList.add(movie);
-
-        mAdapter = new MovieArrayAdapter(mList, this);
+        mAdapter = new MovieArrayAdapter(mList, getApplicationContext());
         recyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
 
-    public Bitmap getBitmapFromURL(String src) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+    private void getMoviesAsync(String threadName, final ArrayList<String> movieNames,
+                                final ArrayList<String> movieDescriptions, final ArrayList<Bitmap> movieImages,
+                                final String urlEndpoint){
+        thread = new HandlerThread(threadName);
+        thread.start();
+        Handler handler4 = new Handler(thread.getLooper());
+        handler4.post(new Runnable() {
+            @Override
+            public void run() {
+                getMovies(movieNames, movieDescriptions, movieImages, urlEndpoint);
+                thread.quitSafely();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (fragmentManager.getBackStackEntryCount() == 0) {
+            fragmentManager.beginTransaction().remove(fragment).commit();
+            nv.setVisibility(View.VISIBLE);
+        } else {
+            this.getSupportFragmentManager().popBackStack();
         }
     }
 }
-
