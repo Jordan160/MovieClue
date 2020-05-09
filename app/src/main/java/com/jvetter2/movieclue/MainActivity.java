@@ -1,12 +1,9 @@
 package com.jvetter2.movieclue;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -14,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -23,23 +19,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -48,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout dl;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
+    private TextView welcomeTV;
+    private TextView welcomeTV2;
+    private ImageView tmdbDisclaimerIV;
 
     public ArrayList<String> upMovieNames = new ArrayList<>();
     public ArrayList<String> upMovieDescriptions = new ArrayList<>();;
@@ -139,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         };
         thread.start();
 
-
         recyclerView = (RecyclerView) findViewById(R.id.movie_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -176,13 +169,16 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             JSONArray jsonArray = jsonObject.getJSONArray("results");
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject c = jsonArray.getJSONObject(i);
                 if(null != movieNames && !movieNames.contains(c.getString("title"))) {
                     movieNames.add(i+1 + ". " + c.getString("title"));
                     movieDescriptions.add(c.getString("overview"));
                     getMovieImage(c.getString("backdrop_path"), movieImages);
                 }
+//                if(i == 10) {
+//                    movieImages.add(BitmapFactory.decodeResource(getResources(), R.drawable.ic_tmdblogo);
+//                }
             }
             if (url.equalsIgnoreCase(getString(R.string.upcoming_url))) {
                 setUpMovieNames(movieNames);
@@ -207,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getMovieImage(String imageURL, ArrayList<Bitmap> movieImages) {
-        ImageDownloader task = new ImageDownloader();
+        ImageDownloader task = new ImageDownloader(getApplicationContext());
 
         try {
             String url = getString(R.string.image_path) + imageURL + "?" + getString(R.string.api_key);
@@ -291,8 +287,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setMovies(ArrayList<String> movieNames, ArrayList<String> movieDescriptions,
                           ArrayList<Bitmap> movieImages) {
+        hideWelcomeViews();
         mList.clear();
-        for (int i = 0; i < movieNames.size(); i++) {
+        for (int i = 0; i < movieImages.size(); i++) {
             Movie movie = new Movie();
             movie.setName(movieNames.get(i));
             movie.setDescription(movieDescriptions.get(i));
@@ -328,5 +325,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             this.getSupportFragmentManager().popBackStack();
         }
+    }
+
+    private void hideWelcomeViews() {
+        welcomeTV = findViewById(R.id.welcomeTV);
+        welcomeTV2 = findViewById(R.id.welcomeTV2);
+        tmdbDisclaimerIV = findViewById(R.id.tmdbDisclaimerIV);
+
+        welcomeTV.setVisibility(View.INVISIBLE);
+        welcomeTV2.setVisibility(View.INVISIBLE);
+        tmdbDisclaimerIV.setVisibility(View.INVISIBLE);
     }
 }

@@ -1,25 +1,37 @@
 package com.jvetter2.movieclue;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+public class ImageDownloader extends AsyncTask<String, String, Bitmap> {
+
+    Context context;
+
+    public ImageDownloader(Context applicationContext) {
+        this.context = applicationContext;
+    }
 
     @Override
     protected Bitmap doInBackground(String... urls) {
         try {
             URL url = new URL(urls[0]);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
+            Bitmap pic = Picasso.with(context).load(String.valueOf(url)).get();
 
-            InputStream in = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(in);
-            return myBitmap;
+
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.connect();
+//
+//            InputStream in = connection.getInputStream();
+//            Bitmap myBitmap = BitmapFactory.decodeStream(in);
+            return pic;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
