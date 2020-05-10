@@ -53,7 +53,7 @@ public class SettingsFragment extends Fragment {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
                 if (checkedRadioButton.getText().equals(getString(R.string.musicOff))) {
-                    MainActivity.mediaPlayer.stop();
+                    MainActivity.mediaPlayer.pause();
                     preferenceEdit.putBoolean("musicPlaying", false);
                     preferenceEdit.commit();
                 } else if (!MainActivity.mediaPlayer.isPlaying()) {
