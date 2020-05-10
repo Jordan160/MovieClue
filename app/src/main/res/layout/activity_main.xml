@@ -21,16 +21,6 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/tmdbDisclaimerIV"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="50dp"
-            android:layout_marginBottom="95dp"
-            android:paddingBottom="5dp"
-            app:srcCompat="@drawable/ic_tmdblogo" />
-
-        <ImageView
             android:id="@+id/tmdbLogoIV"
             android:layout_width="157dp"
             android:layout_height="27dp"

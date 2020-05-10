@@ -1,12 +1,15 @@
 package com.jvetter2.movieclue;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -19,9 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -41,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView nv;
     private TextView welcomeTV;
     private TextView welcomeTV2;
-    private ImageView tmdbDisclaimerIV;
+    public static MediaPlayer mediaPlayer;
+    private SharedPreferences sharedPreferences;
 
     public ArrayList<String> upMovieNames = new ArrayList<>();
     public ArrayList<String> upMovieDescriptions = new ArrayList<>();;
@@ -139,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         setNavigationBar();
         setBottomNavigation();
+        startMusic();
         fragmentManager = getSupportFragmentManager();
 
         getMoviesAsync("thread1", upMovieNames, upMovieDescriptions, upMovieImages, urls[0]);
@@ -279,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        bottomNavigationView.getMenu().findItem(R.id.now_playing).setChecked(true);
+        bottomNavigationView.getMenu().findItem(R.id.now_playing).setChecked(false);
     }
 
     private void setMovies(ArrayList<String> movieNames, ArrayList<String> movieDescriptions,
@@ -331,10 +336,19 @@ public class MainActivity extends AppCompatActivity {
     private void hideWelcomeViews() {
         welcomeTV = findViewById(R.id.welcomeTV);
         welcomeTV2 = findViewById(R.id.welcomeTV2);
-        tmdbDisclaimerIV = findViewById(R.id.tmdbDisclaimerIV);
-
         welcomeTV.setVisibility(View.INVISIBLE);
         welcomeTV2.setVisibility(View.INVISIBLE);
-        tmdbDisclaimerIV.setVisibility(View.INVISIBLE);
+    }
+
+    private void startMusic() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.bensoundcreativeminds);
+        mediaPlayer.setLooping(true);
+
+        sharedPreferences = this.getSharedPreferences("pref", Context.MODE_PRIVATE);
+        boolean musicPlaying = sharedPreferences.getBoolean("musicPlaying", true);
+
+        if (musicPlaying) {
+            mediaPlayer.start();
+        }
     }
 }
