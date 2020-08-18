@@ -9,7 +9,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.preference.PreferenceManager;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -22,20 +22,37 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.reactivestreams.Subscriber;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class MainActivity extends AppCompatActivity implements Callback<MovieResponse> {
     private RecyclerView recyclerView;
     private List<Movie> mList = new ArrayList<>();
     private MovieArrayAdapter mAdapter;
@@ -350,5 +367,88 @@ public class MainActivity extends AppCompatActivity {
         if (musicPlaying) {
             mediaPlayer.start();
         }
+
+
+//        Controller controller = new Controller();
+//        controller.start();
+
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.themoviedb.org/3/movie/")
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        MovieClueInterface backendApi = retrofit.create(MovieClueInterface.class);
+
+//        Call<MovieResponse> call = gerritAPI.getMovie();
+//        call.enqueue(this);
+        backendApi.getMovie().subscribeOn
+
+//        CompositeDisposable compositeDisposable = new CompositeDisposable();
+//
+//
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://api.themoviedb.org/3/movie/")
+//                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//                .build();
+//
+//        MovieClueInterface backendApi = retrofit.create(MovieClueInterface.class);
+//
+//        //RestClient
+//
+//        backendApi.getMovie()
+//                .subscribe(AndroidSchedulers.mainThread())
+
+
+
+        //List<Observable<MovieResponse>> requests = new ArrayList<>();
+        //requests.add(backendApi.getMovie());
+        //requests.add(backendApi.getMovie());
+
+//        Observable
+//                .zip(requests) {
+//                System.out.println("hey!")
+//        }
+
+//
+//        String result = "";
+//        Observable<Observable<MovieResponse>> observer = Observable.just(backendApi.getMovie()); // provides datea
+//        observer.subscribe(s ->
+////                System.out.println(s)
+////        );
+
+
+
+
+//        final Observer movieObservable = backendApi.getMovie()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(new Subscriber<MovieResponse>() {
+//
+//
+//                })
+
+//        Observable.just("long", "longer", "longest")
+//                .subscribeOn(Schedulers.io())
+//                .map(String::length)
+//                .observeOn(Schedulers.computation())
+//                .filter { it > 6 }
+//    .subscribe { length -> println("item length $length") }
+//    }
+
+    }
+
+
+    @Override
+    public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+        response.body();
+    }
+
+    @Override
+    public void onFailure(Call<MovieResponse> call, Throwable t) {
+        call.cancel();
     }
 }
