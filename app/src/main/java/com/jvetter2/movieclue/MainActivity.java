@@ -379,13 +379,37 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.themoviedb.org/3/movie/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
         MovieClueInterface backendApi = retrofit.create(MovieClueInterface.class);
 
 //        Call<MovieResponse> call = gerritAPI.getMovie();
 //        call.enqueue(this);
-        backendApi.getMovie().subscribeOn
+        backendApi.getMovie()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new Observer<MovieResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                       System.out.println(d);
+                    }
+
+                    @Override
+                    public void onNext(MovieResponse movieResponse) {
+                        System.out.println(movieResponse);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        System.out.println(e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
 
 //        CompositeDisposable compositeDisposable = new CompositeDisposable();
 //

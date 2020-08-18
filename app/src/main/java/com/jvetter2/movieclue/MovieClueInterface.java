@@ -12,6 +12,6 @@ import retrofit2.http.Query;
 
 public interface MovieClueInterface {
     @GET("upcoming?api_key=39eded7c924a15985f6ce7c11be25a40")
-    Call<MovieResponse> getMovie();
+    Observable<MovieResponse> getMovie();
     //Call<List<Change>> loadChanges(@Query("q") String status);
 }

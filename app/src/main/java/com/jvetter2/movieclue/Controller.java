@@ -27,8 +27,8 @@ public class Controller implements Callback<MovieResponse> {
 
         MovieClueInterface gerritAPI = retrofit.create(MovieClueInterface.class);
 
-        Call<MovieResponse> call = gerritAPI.getMovie();
-        call.enqueue(this);
+        //Call<MovieResponse> call = gerritAPI.getMovie();
+        //call.enqueue(this);
 
     }
 
